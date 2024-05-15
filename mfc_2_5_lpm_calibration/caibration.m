@@ -10,12 +10,12 @@ data = readtable("dataset.csv");
 
 
 %% Flow Calibration
-X = table2array(data(:, 1:3));  % Q_set P_psi T_tmp
+X = table2array(data(:, 1));  % Q_set P_psi T_tmp
 y = table2array(data(:, 7));    % Q_measure
 
 % linear regression for flow
 
-Q_actual = fitlm(X, y, "PredictorVars",{'Q Set', 'P Meas.','T Meas.'}, 'ResponseVar', 'Q Meas.');
+Q_actual = fitlm(y, X, "PredictorVars",{'Q Meas.'}, 'ResponseVar', 'Q Set.');
 
 X = table2array(data(:, 1));  % Q_set
 y = table2array(data(:, 2));  % P_psi
@@ -30,10 +30,4 @@ Q_temp = fitlm(X, y, "PredictorVars",{'Q Set'}, 'ResponseVar', 'T Meas.');
 
 %% Plot Calibrations
 
-figure()
-plot(Q_actual)
-figure()
-plot(Q_set)
-figure()
-plot(Q_temp)
-
+save("q_calib","Q_actual")
