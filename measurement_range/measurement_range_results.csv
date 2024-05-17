@@ -1,7 +1,7 @@
 OriginalVariableNames,Var1,Units
 Flow,2,LPM
-Chamber CO2 @ HIGH,439.396401419581,PPM
-Chamber CO2 @ LOW,883.928028391616,PPM
+Chamber CO2 @ HIGH,533.452401419581,PPM
+Chamber CO2 @ LOW,977.984028391616,PPM
 Steady State Time @ LOW,1386,S
 Steady State Time @ HIGH,2754,S
 Chamber to Ambient CO2 Difference @ LOW,23.3964014195808,PPM
