@@ -8,7 +8,7 @@
 clc, clear, close all
 %% Import DAQ Dataset
 
-daq = importdaqfile("daq.txt");
+daq = importdaqfile("daq_gh_colo2.txt");
 
 
 %% Import PICARRO Datasets from subfolder
