@@ -50,7 +50,7 @@ title("Ambient Colocation Raw Data")
 grid on
 
 %% Apply Windowing Filter and Syncronize Dataset
-windowSize = 1000;
+windowSize = 100;
 num_trans = (1/windowSize)*ones(1,windowSize);
 den_trans = 1;
 picarro.CO2_sync = filter(num_trans, den_trans, picarro.CO2_sync);
