@@ -1,12 +1,12 @@
 OriginalVariableNames,Var1,Units
 Flow,2,LPM
-Chamber CO2 @ HIGH,533.452401419581,PPM
-Chamber CO2 @ LOW,977.984028391616,PPM
+Chamber CO2 @ LOW,23.3964014195808,PPM
+Chamber CO2 @ HIGH,467.928028391616,PPM
 Steady State Time @ LOW,1386,S
 Steady State Time @ HIGH,2754,S
 Chamber to Ambient CO2 Difference @ LOW,23.3964014195808,PPM
 Chamber to Ambient CO2 Difference @ HGIH,467.928028391616,PPM
-Flux Uncertainty @ LOW,0.0955590059036331,UMOL/M^2/S
+Flux Uncertainty @ LOW,0.095559005903633,UMOL/M^2/S
 Flux Uncertainty @ HIGH,1.65070447797578,UMOL/M^2/S
 Measurable Flux @ LOW,0.595559005903633,UMOL/M^2/S
 Measurable Flux @ HIGH,8.34929552202422,UMOL/M^2/S
