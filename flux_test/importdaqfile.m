@@ -1,4 +1,4 @@
-function daq = importdaqfile(filename, dataLines)
+function daq = IMPORTDAQFILE(filename)
 %IMPORTFILE Import data from a text file
 %  DAQ = IMPORTFILE(FILENAME) reads data from text file FILENAME for the
 %  default selection.  Returns the data as a table.
