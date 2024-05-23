@@ -50,7 +50,7 @@ title("Ambient Colocation Raw Data")
 grid on
 
 %% Apply Windowing Filter and Syncronize Dataset
-windowSize = 100;
+windowSize = 1000;
 num_trans = (1/windowSize)*ones(1,windowSize);
 den_trans = 1;
 picarro.CO2_sync = filter(num_trans, den_trans, picarro.CO2_sync);
@@ -192,3 +192,6 @@ xlabel("Picarro CO_2 [ppm]")
 legend(["RMSE:    "+lin_regb_rmse+"\newlineR^2:    "+lin_regb_r2,'1:1 Fit'])
 grid on
 sgtitle("Comparison of Linear and ANN Regression Performance")
+
+%%
+save("../flux_test/calib", 'lin_rega', 'lin_regb', 'ann_rega', 'ann_regb')
