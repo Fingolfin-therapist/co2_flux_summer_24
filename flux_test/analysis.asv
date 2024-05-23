@@ -119,16 +119,16 @@ corrected_corr_data = rmmissing(corrected_corr_data);
     
 figure();
 hold on;
-plot(corrected_corr_data.T, corrected_corr_data.C, 'b', 'DisplayName', 'LICOR C');
-plot(corrected_corr_data.T, corrected_corr_data.CB, 'g', 'DisplayName', 'Corr. DAQ CB');
-plot(corrected_corr_data.T, corrected_corr_data.CA, 'r', 'DisplayName', 'Corr. DAQ CA');
-plot(corr_data.T, corr_data.CB, 'c', 'DisplayName', 'DAQ CB')
-plot(corr_data.T, corr_data.CA, 'm', 'DisplayName', 'DAQ CA')
+plot(corrected_corr_data.T, corrected_corr_data.C, 'b', 'DisplayName', 'Raw LICOR');
+plot(corrected_corr_data.T, corrected_corr_data.CB, 'g', 'DisplayName', 'Corrected DAQ Chamber');
+plot(corrected_corr_data.T, corrected_corr_data.CA, 'r', 'DisplayName', 'Corrected DAQ Ambient');
+plot(corr_data.T, corr_data.CB, 'c', 'DisplayName', 'Raw DAQ Chamber')
+plot(corr_data.T, corr_data.CA, 'm', 'DisplayName', 'Raw DAQ Ambient')
 ylabel('CO_2 [ppm]');
 legend();
-title(['Automatic Time-Correction of Flux Test Dataset ' dataset]);
+title(["Automatic Timestamp Correction" "[DATASET " + dataset + "]"]);
 xlabel('Time');
-
+grid on
 hold off;
 corr_data = corrected_corr_data;
 
@@ -136,8 +136,10 @@ corr_data = corrected_corr_data;
 
 load('calib.mat')
 
-corr_data.CB_CALIB = ann_regb([corr_data.CB, corr_data.TB, corr_data.HB]')';
-corr_data.CA_CALIB = ann_rega([corr_data.CA, corr_data.TA, corr_data.HA]')';
+corr_data.CB_CALIB = predict(lin_rega, [corr_data.CB, corr_data.TB, corr_data.HB]);
+corr_data.CA_CALIB = predict(lin_regb, [corr_data.CA, corr_data.TA, corr_data.HA]);
+corr_data.CB_CALIB = ann_rega, [corr_data.CB, corr_data.TB, corr_data.HB]);
+corr_data.CA_CALIB = ann_regb, [corr_data.CA, corr_data.TA, corr_data.HA]);
 
 figure();
 hold on;
@@ -147,7 +149,7 @@ plot(corr_data.T, corr_data.CB, 'c', 'DisplayName', 'DAQ CB')
 plot(corr_data.T, corr_data.CA, 'm', 'DisplayName', 'DAQ CA')
 ylabel('CO_2 [ppm]');
 legend();
-title(['Calibrations of ELT Sensors of Flux Test Dataset ' dataset]);
+title(["Calibrations Applied to Flux Dataset" "[DATASET " + dataset + "]"]);
 xlabel('Time');
 
 hold off;
@@ -216,11 +218,15 @@ for dataset_idx = 1:height(map)
     
     
     data.F = (lpm_to_cms(data.Q./1000).*ppm_to_mol(data.CB-data.CA))./As;
-    data.F = (lpm_to_cms(data.Q./1000).*ppm_to_mol(data.CB-data.CA))./As;
+    data.F_FLOOR = (lpm_to_cms(data.Q./1000).*ppm_to_mol(data.CB_FLOOR-data.CA_FLOOR))./As;
+    data.F_LICOR = (lpm_to_cms(data.Q./1000).*ppm_to_mol(data.C_FLOOR))./As;
     figure();
     hold on;
     plot(data.T(cb_ss), data.F(cb_ss), 'go', 'DisplayName', 'SS Flux');
+    plot(data.T(c_ss), data.F_LICOR(c_ss), 'co', 'DisplayName', 'SS Flux FLOOR LICOR');
     plot(data.T, data.F, 'r.', 'DisplayName', 'Flux');
+    plot(data.T, data.F_FLOOR, 'm.', 'DisplayName', 'Flux FLOOR');
+    plot(data.T, data.F_LICOR, 'b.', 'DisplayName', 'Flux FLOOR LICOR');
     ylabel('CO_2 Flux μmol/m^2/s');
     legend();
     title(['Flux Data-Points of Flux Test Dataset ' dataset]);
