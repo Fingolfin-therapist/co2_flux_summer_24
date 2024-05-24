@@ -49,7 +49,7 @@ daq.T = timeofday(daq.T) + daqoffset;
 %% Find Cross-Corelation Lag & Offset Datasets
 
 % synchronize dataset, resample at 5-seconds per datapoint
-corr_data = synchronize(licor, daq, 'regular', 'mean','TimeStep', seconds(5));
+corr_data = synchronize(licor, daq, 'regular', 'mean','TimeStep', seconds(10));
 corr_data_c = corr_data.C;
 corr_data_cb = corr_data.CB;
 
