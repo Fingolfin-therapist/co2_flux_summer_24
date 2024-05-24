@@ -11,11 +11,12 @@ clc, clear, close all
 data = readtable("calibration_slpm.csv");
 
 %% Flow Calibration
-X = table2array(data(:, 1));  % LPM
-y = table2array(data(:, 2));  % SLPM
+y = table2array(data(:, 1));  % LPM
+X = table2array(data(:, 2));  % SLPM
 
 % Linear Regression for Flow
-Q_actual = fitlm(X, y);
+Q_actual = fitlm(y, X);
 
 %% Plot Calibrations
 save("q_calib","Q_actual")
+save("../flux_test/mfc_q_calib","Q_actual")

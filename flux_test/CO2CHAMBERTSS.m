@@ -13,9 +13,9 @@ Cchmb = 0;
 t = t0;
 
 % run time to steady state calculation
-while Cchmb <= (Cchmb_tss - uCchmb)
-    Cchmb = Camb + (F.*As./Q).*(1-exp(-Q.*t./V));
-    data = [data; [t, Cchmb]];
+while Cchmb <= abs(Cchmb_tss - uCchmb)
+    Cchmb = Camb + (F.*As./Q).*(1-exp(-Q.*seconds(t-t0)./V));
+    data = [data; [seconds(t), Cchmb]];
     t = t + dt;
 end
 
