@@ -82,11 +82,11 @@ data = [data.CA, data.TA, data.HA, data.CB, data.TB, data.HB, data.CO2_sync];
 testd = data(cv.test, :);
 traind = data(~cv.test, :);
 
-train_ca = traind(:, 1:3);
-train_cb = traind(:, 4:6);
+train_ca = traind(:, 1);
+train_cb = traind(:, 4);
 train_ct = traind(:, 7);
-test_ca = testd(:, 1:3);
-test_cb = testd(:, 4:6);
+test_ca = testd(:, 1);
+test_cb = testd(:, 4);
 test_ct = testd(:, 7);
 
 %% Linear Regression
