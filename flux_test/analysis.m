@@ -14,7 +14,7 @@ As = 0.064844702; % [m^2]
 V  = 0.015220183; % [m^3]
 
 % Environment Assumptions
-P = 101325; % [Pa]
+P = 79082.866; % [Pa]
 T = 293.15; % [K]
 
 % Flow Meas. Uncertainty
@@ -24,11 +24,11 @@ uQ = 0.33; % [lpm]
 uQ_mfcperc = 2;
 
 % Preprocessingw
-sample_dt = seconds(240);     % retiming applied to entire dataset
-smooth_dt = seconds(240);   % retiming applied to per set-point dataset
+sample_dt = minutes(1);     % retiming applied to entire dataset
+smooth_dt = minutes(1);   % retiming applied to per set-point dataset
 
 % Choose Dataset (File Location)
-dataset = "5.21";
+dataset = "5.29";
 
 %% Helper Functions
 
@@ -83,7 +83,6 @@ metrics_sp = zeros(height(map), 4);
 data_sp = cell(height(map),1);
 
 for sp_idx = 1:height(map)
-    
     % get sp timestamps
     tStart = map{sp_idx, 8};
     tStartLicor = map{sp_idx, 10};
@@ -95,8 +94,10 @@ for sp_idx = 1:height(map)
     data = sync_data(data_idx, :);
     
     % apply retime average
-    data = retime(data, 'regular', 'mean', 'TimeStep', smooth_dt);
-    data = rmmissing(data);
+    %data = retime(data, 'regular', 'mean', 'TimeStep', smooth_dt);
+    %data = rmmissing(data);
+    data = smoothdata(data, 'movmean', smooth_dt);
+
 
     % calculate theoretical steady state
     [tss_data_l, tss_l, Cchmb_l] = CO2CHAMBERTSS(seconds(1), ppm_to_mol(mean(data.CA_CALIB)), map{sp_idx, 13}*1e-6, As, lpm_to_cms(mean(data.Q_CALIB)), seconds(1), V, ppm_to_mol(5));
@@ -203,6 +204,8 @@ for sp_idx = 1:height(map)
     title(["Flux Results - Delivering " + map{sp_idx, 13} + " μmol/m^2/s", "[DATASET " + dataset + "]"]);
     xlabel('Time');
     hold off;
+    disp(data.C_CALIB(1));
+    disp(data.C_CALIB(end));
     
 end
 %%
