@@ -14,6 +14,21 @@ V  = 0.015220183; % [m^3]
 P = 101325; % [Pa]
 T = 293.15; % [K]
 
+% Flow Meas. Uncertainty
+uQ = 0.33; % [lpm]
+
+% MFC Uncertainty (%RD)
+uQ_mfcperc = 2;
+
+% Preprocessingw
+sample_dt = seconds(5);     % retiming applied to entire dataset
+smooth_dt = seconds(5);   % retiming applied to per set-point dataset
+
+% Choose Dataset (File Location)
+dataset = "5.21";
+
+%% Helper Functions
+
 % Unit Conversion Functions
 ppm_to_mol = @(ppm) (ppm*P)/(1e6*8.314*T);  % ppm to mol/m^3
 mol_to_ppm = @(mol) (1e6*8.314*mol*T)/P;    % mol/m^3 to ppm
@@ -46,7 +61,23 @@ daqoffset = min(table2array(map(:,8)));
 % if daq has timestamp issue, do offset with start of test sequence
 daq.T = timeofday(daq.T) + daqoffset;
 
-%% Find Cross-Corelation Lag & Offset Datasets
+
+% sychronize both datasets
+% Convert time columns to datetime arrays
+time_licor = licor.T;
+time_daq = daq.T;
+
+% Create a regular time vector
+timeGrid = (min(time_licor):sample_dt:max(time_licor))';
+
+% Interpolate licor data
+licor_interp = retime(licor, timeGrid, 'mean');
+
+% Interpolate daq data
+daq_interp = retime(daq, timeGrid, 'mean');
+
+% Synchronize the interpolated data
+sync_data = synchronize(licor_interp, daq_interp, 'regular', 'mean', 'TimeStep', sample_dt);
 
 % synchronize dataset, resample at 5-seconds per datapoint
 corr_data = synchronize(licor, daq, 'regular', 'mean','TimeStep', seconds(10));
