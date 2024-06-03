@@ -20,19 +20,23 @@ for dataset = config.datasets
     % apply calibrations
     [data, co2_err] = CALIBRATE(data, dataset);
 
-    for sp_idx = height(map)
+    for sp_idx = 1:1:height(map)
         
         % get sp timestamps
         tStartLicor = map{sp_idx, 10};
         tEndLicor = map{sp_idx, 11};
 
-        
-        [data, results] = CALCFLUX(data, co2_err, config);
+        % get delivered fluxes
+        f_delivered = map{sp_idx, 13};
+
+        % calculate fluxes
+        [data, results] = CALCFLUX(data, co2_err, config, f_delivered);
+
+        % store dataset
+        writetimetable(data, "data/analysis/" + dataset + "no" + sp_idx +"results.csv");
+
+        disp(results)
 
     end
-
-    
-
-
 
 end
