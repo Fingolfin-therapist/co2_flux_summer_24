@@ -1,4 +1,4 @@
-function [data, results] = CALCFLUX(data,co2_err,config)
+function [data, results] = CALCFLUX(data,co2_err,config, f_delivered)
 
 
 % convert to working units
@@ -20,6 +20,8 @@ data.F = 1e6*(data.Q.*(data.CB-data.CA))./config.As;
 data.F_licor = 1e6*(data.Q.*(data.C-data.C(1)))./config.As;
 data.UF = 1e6*config.flux_uncert(data.CB-data.CA, config.As, co2_err, config.uQ, data.Q);
 
-results = [];
+results = [data.F(end), data.F_licor(end), f_delivered];
+
+
 end
 

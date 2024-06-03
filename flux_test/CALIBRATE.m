@@ -10,7 +10,7 @@ function [data, co2_err] = CALIBRATE(data, dataset)
     end
    
     % manual linear regressions
-    data.C = data.C.*0.988+31.837;
+    data.C = data.C.*0.9883+24.6914;
     data.Q = data.Q*1.227+0.0143;
 
     % apply ANN regressions, instead of linear

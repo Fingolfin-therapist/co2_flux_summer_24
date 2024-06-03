@@ -28,7 +28,7 @@ sample_dt = seconds(5);     % retiming applied to entire dataset
 smooth_dt = minutes(2);   % retiming applied to per set-point dataset
 
 % Choose Dataset (File Location)
-dataset = "5.21";
+dataset = "5.29";
 
 %% Helper Functions
 
@@ -74,7 +74,7 @@ sync_data = synchronize(licor, daq, 'regular', 'mean','TimeStep', sample_dt);
 clear licor daq
 %% Correct Timestamps
 %if dataset ~= '5.29'
-sync_data = correctTimestamps(sync_data);
+%sync_data = correctTimestamps(sync_data);
 %end
 %% Calibrate Sensors
 
@@ -167,6 +167,7 @@ for sp_idx = 1:height(map)
     plot(data.T, data.CB_FLOOR, 'g.-', 'DisplayName', 'DAQ CB');
     plot(data.T, data.CA_FLOOR, 'r.-', 'DisplayName', 'DAQ CA');
     plot(data.T, data.C_FLOOR, 'c.-', 'DisplayName', 'LICOR')
+    plot(tss_data_l.Time, tss_data_l.CO2-min(tss_data_l.CO2), 'k-', 'DisplayName', 'Expected Chamber Concentration', 'LineWidth', 2)
     ylabel('CO_2 [ppm]');
     legend();
     title(["Floored Data - Delivering " + map{sp_idx, 13} + " μmol/m^2/s", "[DATASET " + dataset + "]"]);
@@ -191,8 +192,8 @@ for sp_idx = 1:height(map)
     % plot fluxes
     subplot(2, 3, 5)
     hold on;
-    errorbar(data.T(cb_ss), data.F(cb_ss), data.UF(cb_ss), 'g.-', 'DisplayName', "SS Flux, μ: " + f_mean_ss + " μmol/m^2/s");
-    errorbar(data.T(c_ss), data.F_LICOR(c_ss), data.UF_LICOR(c_ss), 'r.-', 'DisplayName', "SS Flux LICOR, μ: " + f_licor_mean_ss + " μmol/m^2/s");
+    errorbar(data.T(cb_ss), data.F(cb_ss), data.UF(cb_ss), 'g.-', 'DisplayName', "SS Flux, " + f_mean_ss + " μmol/m^2/s");
+    errorbar(data.T(c_ss), data.F_LICOR(c_ss), data.UF_LICOR(c_ss), 'r.-', 'DisplayName', "SS Flux LICOR, " + f_licor_mean_ss + " μmol/m^2/s");
     yline(map{sp_idx, 13}, 'k--', 'DisplayName', "Delivered Flux")
     ylabel('CO_2 Flux μmol/m^2/s');
     legend();
