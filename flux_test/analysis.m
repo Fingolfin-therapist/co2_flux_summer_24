@@ -14,7 +14,7 @@ As = 0.064844702; % [m^2]
 V  = 0.015220183; % [m^3]
 
 % Environment Assumptions
-P = 79082.866; % [Pa]
+P = 78082.9; % [Pa]
 T = 293.15; % [K]
 
 % Flow Meas. Uncertainty
@@ -24,11 +24,11 @@ uQ = 0.33; % [lpm]
 uQ_mfcperc = 2;
 
 % Preprocessingw
-sample_dt = minutes(1);     % retiming applied to entire dataset
-smooth_dt = minutes(1);   % retiming applied to per set-point dataset
+sample_dt = seconds(5);     % retiming applied to entire dataset
+smooth_dt = minutes(2);   % retiming applied to per set-point dataset
 
 % Choose Dataset (File Location)
-dataset = "5.29";
+dataset = "5.21";
 
 %% Helper Functions
 
@@ -39,11 +39,6 @@ lpm_to_cms = @(lpm) lpm/60000;              % liters per min to m^3 per min
 cms_to_lpm = @(cms) cms*60000;              % m^3 per min to liters per min
 
 % Uncertainty in Flux Measurement Function
-% dC [mol/m^3]
-% As [m^2]
-% uQ [m^3/s]
-% uC [mol/m^3]
-% Q  [m^3/s]
 flux_uncert = @(dC, As, uQ, uC, Q) sqrt( (dC.*uQ./As).^2 + ((2.*Q.*uC)./As).^2 );
 
 
@@ -65,18 +60,26 @@ map = map(sp_idx,:);
 daqoffset = min(table2array(map(:,8)));
 
 % daq dataset was set to epoch, resetting shifting by start of flux tests
-daq.T = timeofday(daq.T) + daqoffset;
+if dataset == '5.21'
+daq.T = timeofday(daq.T) + daqoffset - minutes(69);
+elseif dataset == '5.22'
+daq.T = timeofday(daq.T) + daqoffset - minutes(34);
+elseif dataset == '5.29'
+daq.T = daq.T + hours(1) + minutes(42);
+end
 
 % sychronize both datasets
 sync_data = synchronize(licor, daq, 'regular', 'mean','TimeStep', sample_dt);
 
 clear licor daq
 %% Correct Timestamps
-
+%if dataset ~= '5.29'
 sync_data = correctTimestamps(sync_data);
+%end
 %% Calibrate Sensors
 
-[sync_data, ca_rmse, cb_rmse] = applyCalibrations(sync_data, 0);
+[sync_data, ca_rmse, cb_rmse] = applyCalibrations(sync_data, 0, dataset);
+
 
 %% Seperate Datasets into Set Points
 metrics_sp = zeros(height(map), 4);
@@ -114,16 +117,20 @@ for sp_idx = 1:height(map)
     c_ss = findSteadyStateIndices(data, "C_CALIB", cb_rmse);
 
     % calculate flux
+
+
+
     data.F = ((lpm_to_cms(data.Q_CALIB).*ppm_to_mol(data.CB_CALIB-data.CA_CALIB))./As).*1e6;
-    data.F_LICOR = ((lpm_to_cms(data.Q_CALIB).*ppm_to_mol(data.C_FLOOR))./As).*1e6;
+
+    data.F_LICOR = ((lpm_to_cms(data.Q_CALIB).*ppm_to_mol(data.C -data.C(1)))./As).*1e6;
         
     data.UF = flux_uncert(ppm_to_mol(data.CB-data.CA), As, lpm_to_cms(uQ), ppm_to_mol(cb_rmse+ca_rmse/2), lpm_to_cms(data.Q))*1e6;
     data.UF_LICOR = flux_uncert(ppm_to_mol(data.CB-data.CA), As, lpm_to_cms(uQ), ppm_to_mol(1.5), lpm_to_cms(data.Q))*1e6;
 
-    f_mean_ss = mean(data.F(cb_ss));
-    uf_mean_ss = mean(data.UF(cb_ss));
-    f_licor_mean_ss = mean(data.F_LICOR(c_ss));
-    uf_licor_mean_ss = mean(data.UF_LICOR(c_ss));
+    f_mean_ss = mean(data.F(end));
+    uf_mean_ss = mean(data.UF(end));
+    f_licor_mean_ss = mean(data.F_LICOR(end));
+    uf_licor_mean_ss = mean(data.UF_LICOR(end));
 
     metrics_sp(sp_idx, :) = [f_mean_ss, uf_mean_ss, f_licor_mean_ss, uf_licor_mean_ss];
     
@@ -311,13 +318,19 @@ function shift_data = shiftData(data, lag)
 
 end
 
-function [calibrated_data, ca_rmse, cb_rmse] = applyCalibrations(sync_data, verbose)
+function [calibrated_data, ca_rmse, cb_rmse] = applyCalibrations(sync_data, verbose, dataset)
 
     load('calib.mat', '*');
 
-    sync_data.CB_CALIB = predict(lin_rega, sync_data.CB);
-    sync_data.CA_CALIB = predict(lin_regb, sync_data.CA);
-    sync_data.C_CALIB = sync_data.C.*0.9996-5.5211;
+    if dataset == '5.29'
+        sync_data.CB_CALIB = predict(lin_regb, sync_data.CB);
+        sync_data.CA_CALIB = predict(lin_rega, sync_data.CA);
+    else
+        sync_data.CB_CALIB = predict(lin_rega, sync_data.CB);
+        sync_data.CA_CALIB = predict(lin_regb, sync_data.CA);
+    end
+   
+    sync_data.C_CALIB = sync_data.C.*0.988+31.837;
     sync_data.Q_CALIB = sync_data.Q*1.227+0.0143;
     % apply ANN regressions, instead of linear
     %corr_data.CB_CALIB = ann_regb(corr_data.CB')';
