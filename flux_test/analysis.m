@@ -16,6 +16,7 @@ V  = 0.015220183; % [m^3]
 % Environment Assumptions
 P = 78082.9; % [Pa]
 T = 293.15; % [K]
+MW = 44010; % [mg/mol]
 
 % Flow Meas. Uncertainty
 uQ = 0.33; % [lpm]
@@ -33,8 +34,8 @@ dataset = "5.29";
 %% Helper Functions
 
 % Unit Conversion Functions
-ppm_to_mol = @(ppm) (ppm*P)/(1e6*8.314*T);  % ppm to mol/m^3
-mol_to_ppm = @(mol) (1e6*8.314*mol*T)/P;    % mol/m^3 to ppm
+ppm_to_mgm3 = @(ppm) (ppm*P*MW)/(1e6*8.3145*T);  % ppm to mol/m^3
+mgm3_to_ppm = @(mol) (1e6*8.3145*mol*T)/(P*MW);    % mol/m^3 to ppm
 lpm_to_cms = @(lpm) lpm/60000;              % liters per min to m^3 per min
 cms_to_lpm = @(cms) cms*60000;              % m^3 per min to liters per min
 
@@ -103,9 +104,9 @@ for sp_idx = 1:height(map)
 
 
     % calculate theoretical steady state
-    [tss_data_l, tss_l, Cchmb_l] = CO2CHAMBERTSS(seconds(1), ppm_to_mol(mean(data.CA_CALIB)), map{sp_idx, 13}*1e-6, As, lpm_to_cms(mean(data.Q_CALIB)), seconds(1), V, ppm_to_mol(5));
+    [tss_data_l, tss_l, Cchmb_l] = CO2CHAMBERTSS(seconds(1), ppm_to_mgm3(mean(data.CA_CALIB)), map{sp_idx, 13}*1e-6, As, lpm_to_cms(mean(data.Q_CALIB)), seconds(1), V, ppm_to_mgm3(5));
     tss_data_l.Time = seconds(tss_data_l.TIME) + data.T(1);
-    tss_data_l.CO2 = mol_to_ppm(tss_data_l.CO2);
+    tss_data_l.CO2= mgm3_to_ppm(tss_data_l.CO2);
 
     % calculate floor dataset, because we are looking for offsets
     data.C_FLOOR = data.C_CALIB - min(data.C_CALIB);
@@ -120,12 +121,12 @@ for sp_idx = 1:height(map)
 
 
 
-    data.F = ((lpm_to_cms(data.Q_CALIB).*ppm_to_mol(data.CB_CALIB-data.CA_CALIB))./As).*1e6;
+    data.F = ((lpm_to_cms(data.Q_CALIB).*ppm_to_mgm3(data.CB_CALIB-data.CA_CALIB))./As).*1e6;
 
-    data.F_LICOR = ((lpm_to_cms(data.Q_CALIB).*ppm_to_mol(data.C -data.C(1)))./As).*1e6;
+    data.F_LICOR = ((lpm_to_cms(data.Q_CALIB).*ppm_to_mgm3(data.C -data.C(1)))./As).*1e6;
         
-    data.UF = flux_uncert(ppm_to_mol(data.CB-data.CA), As, lpm_to_cms(uQ), ppm_to_mol(cb_rmse+ca_rmse/2), lpm_to_cms(data.Q))*1e6;
-    data.UF_LICOR = flux_uncert(ppm_to_mol(data.CB-data.CA), As, lpm_to_cms(uQ), ppm_to_mol(1.5), lpm_to_cms(data.Q))*1e6;
+    data.UF = flux_uncert(ppm_to_mgm3(data.CB-data.CA), As, lpm_to_cms(uQ), ppm_to_mgm3(cb_rmse+ca_rmse/2), lpm_to_cms(data.Q))*1e6;
+    data.UF_LICOR = flux_uncert(ppm_to_mgm3(data.CB-data.CA), As, lpm_to_cms(uQ), ppm_to_mgm3(1.5), lpm_to_cms(data.Q))*1e6;
 
     f_mean_ss = mean(data.F(end));
     uf_mean_ss = mean(data.UF(end));
@@ -331,7 +332,7 @@ function [calibrated_data, ca_rmse, cb_rmse] = applyCalibrations(sync_data, verb
         sync_data.CA_CALIB = predict(lin_regb, sync_data.CA);
     end
    
-    sync_data.C_CALIB = sync_data.C.*0.988+31.837;
+    sync_data.C_CALIB = sync_data.C.*0.9883+24.6914;
     sync_data.Q_CALIB = sync_data.Q*1.227+0.0143;
     % apply ANN regressions, instead of linear
     %corr_data.CB_CALIB = ann_regb(corr_data.CB')';

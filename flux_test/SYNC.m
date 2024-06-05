@@ -5,7 +5,7 @@ function [data] = SYNC(daq, licor, map, config, dataset)
     % get offset from map table
     sp_idx = table2array(map(:,1)) == double(dataset);
     map = map(sp_idx,:);
-    daqoffset = min(table2array(map(:,8)));
+    daqoffset = min(table2array(map(sp_idx,8)));
 
     % daq dataset was set to epoch, resetting shifting by start of flux tests
     if dataset == "5.21"
@@ -46,7 +46,7 @@ function [data] = SYNC(daq, licor, map, config, dataset)
         
         
     end
-    fields = ["CA", "CB", "TA", "TB", "HA", "HB","Q"];
+     fields = ["CA", "CB", "TA", "TB", "HA", "HB","Q"];
     for field = fields
         data.(field) = SHIFTDATA(data.(field), opt_lag);
     end
