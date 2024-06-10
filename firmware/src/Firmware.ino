@@ -57,11 +57,18 @@ LiquidCrystal 	lcd(LCD_RS_PIN, LCD_EN_PIN, LCD_D4_PIN, LCD_D5_PIN, LCD_D6_PIN, L
 // SD Card
 //SdFat sd;
 //SdFile file;
+Sd2Card card;
+SdVolume volume;
+SdFile root;
 
 // Setup Routine
 void setup() {
 	// Init Communication Channels
 	Serial.begin(115200);
+
+	float voltage = analogRead(A5);
+	Serial.println(voltage);
+
 	//Serial.println("\n\nStarting CO2 Flux DAQ...");
 	Wire.begin();
 	lcd.begin(16, 2);
@@ -90,6 +97,39 @@ void setup() {
 			//rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 		//}
 	}
+
+	Serial.print("\nInitializing SD card...");
+
+  // we'll use the initialization code from the utility libraries
+  // since we're just testing if the card is working!
+  if (!card.init(SPI_HALF_SPEED, SD_CS_PIN)) {
+    Serial.println("initialization failed. Things to check:");
+    Serial.println("* is a card inserted?");
+    Serial.println("* is your wiring correct?");
+    Serial.println("* did you change the chipSelect pin to match your shield or module?");
+    Serial.println("Note: press reset button on the board and reopen this Serial Monitor after fixing your issue!");
+    while (1);
+  } else {
+    Serial.println("Wiring is correct and a card is present.");
+  }
+
+  // print the type of card
+  Serial.println();
+  Serial.print("Card type:         ");
+  switch (card.type()) {
+    case SD_CARD_TYPE_SD1:
+      Serial.println("SD1");
+      break;
+    case SD_CARD_TYPE_SD2:
+      Serial.println("SD2");
+      break;
+    case SD_CARD_TYPE_SDHC:
+      Serial.println("SDHC");
+      break;
+    default:
+      Serial.println("Unknown");
+  }
+
 
 	// SD Card Setup
 	//Serial.println("\t- Micro-SD:\t");
@@ -285,7 +325,20 @@ void loop() {
 			Serial.println("done.");
 		} else {
 			// if the file didn't open, print an error:
-			Serial.print("error opening ");
+			Serial.println("error opening ");
+			digitalWrite(DATA_LED_PIN, LOW);
+			delay(50);
+			digitalWrite(DATA_LED_PIN, HIGH);
+			delay(50);
+			digitalWrite(DATA_LED_PIN, LOW);
+			delay(50);
+			digitalWrite(DATA_LED_PIN, HIGH);
+			delay(50);
+			digitalWrite(DATA_LED_PIN, LOW);
+			delay(50);
+			digitalWrite(DATA_LED_PIN, HIGH);
+			delay(50);
+			digitalWrite(DATA_LED_PIN, LOW);
 		}
 		file.close();
 
