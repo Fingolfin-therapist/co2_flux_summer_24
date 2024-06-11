@@ -1,4 +1,4 @@
-function [data, tss, Cchmb_tss] = CO2CHAMBERTSS(dt, Camb, F, As, Q, t0, V, uCchmb)
+function [data, tss, Cchmb_tss] = CO2CHAMBERTSS(Cchmb_func, dt, Camb, F, As, Q, t0, V, uCchmb)
 %MASSBALANCETSS Evaluates the CO2 Chamber mass balance function untill
 %value reaches known steady state value within uncertainty range.
 

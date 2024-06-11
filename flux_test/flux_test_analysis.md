@@ -1,34 +1,49 @@
 # Pipeline
 
 1. Import Data
+    - `importdaqfile`
+    - `importlicorfile`
 2. Correct Timestamps
-3. Calibrate Sensors / Reference Instrument
-4. Per Set-Point Analysis
+    - `detectoffset`
+    - `applyoffset`
+3. Smooth Dataset
+    1. Windowing Function
+    `movmean`
+    2. High Pass
+    `hipass`
+    3. Retiming
+    `retime`
+4. Apply Specific Correction
 
-   1. Determine Steady State Periods
+    - `load correction`
+    - `apply correction`
+5. Merge Datasets w/ Reference if Necessary
 
-       - `movmean < threshold`
+    - `merge`
+6. Determine Steady State Periods
 
-   2. Calculate Flux
+    - `movmean < threshold`
 
-       - Use gradient method on non-steady state values.
-       - Use steady-state model on assumed steady state periods.
+7. Calculate Flux
 
-   3. Format Data
+    - Use gradient method on non-steady state values.
+    - Use steady-state model on assumed steady state periods.
 
-       - Organize and document all actions performed on the datasets.
-       - Organize all of the data to one .csv file showing important numbers.
+8. Format Data
 
-   4. Display Data
+    - Organize and document all actions performed on the datasets.
+    - Organize all of the data to one .csv file showing important numbers.
 
-       - Display important information
+9. Display Data
 
-   5.  Generate Plots
+    - Display important information
 
-       - Generate plots
-       - Display Important Plots
+10. Generate Plots
 
-5.  Save Data
+    - Generate plots
+    - Display Important Plots
+
+11. Save Data
 
 ## Information
 - What ELTs map to which DAQ column.
