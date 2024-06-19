@@ -16,7 +16,7 @@
 
 // SETTINGS ===================================
 
-const bool DATALOG = true;
+const bool DATALOG = false;
 const char* LOGFILENAME = "data.txt";
 
 const bool SAMPLE = true;
@@ -52,7 +52,6 @@ DHT dhtB(DHT_DATA_B_PIN, DHT11);
 
 // Peripheral Globals
 RTC_DS1307		rtc;
-LiquidCrystal 	lcd(LCD_RS_PIN, LCD_EN_PIN, LCD_D4_PIN, LCD_D5_PIN, LCD_D6_PIN, LCD_D7_PIN);
 
 // SD Card
 //SdFat sd;
@@ -66,20 +65,10 @@ void setup() {
 	// Init Communication Channels
 	Serial.begin(115200);
 
-	float voltage = analogRead(A5);
-	Serial.println(voltage);
-
 	//Serial.println("\n\nStarting CO2 Flux DAQ...");
 	Wire.begin();
-	lcd.begin(16, 2);
 	pinMode(DATA_LED_PIN, OUTPUT);
 	pinMode(PUMP_LED_PIN, OUTPUT);
-
-	// Display Init Message
-	lcd.setCursor(0, 0);
-	lcd.print("  Initializing  ");
-	lcd.setCursor(0, 1);
-	lcd.print("  CO2 Flux DAQ  ");
 
 	// GPIO Output Setup
 	pinMode(PUMP_TRIG_PIN, OUTPUT);
@@ -97,38 +86,6 @@ void setup() {
 			//rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 		//}
 	}
-
-	Serial.print("\nInitializing SD card...");
-
-  // we'll use the initialization code from the utility libraries
-  // since we're just testing if the card is working!
-  if (!card.init(SPI_HALF_SPEED, SD_CS_PIN)) {
-    Serial.println("initialization failed. Things to check:");
-    Serial.println("* is a card inserted?");
-    Serial.println("* is your wiring correct?");
-    Serial.println("* did you change the chipSelect pin to match your shield or module?");
-    Serial.println("Note: press reset button on the board and reopen this Serial Monitor after fixing your issue!");
-    while (1);
-  } else {
-    Serial.println("Wiring is correct and a card is present.");
-  }
-
-  // print the type of card
-  Serial.println();
-  Serial.print("Card type:         ");
-  switch (card.type()) {
-    case SD_CARD_TYPE_SD1:
-      Serial.println("SD1");
-      break;
-    case SD_CARD_TYPE_SD2:
-      Serial.println("SD2");
-      break;
-    case SD_CARD_TYPE_SDHC:
-      Serial.println("SDHC");
-      break;
-    default:
-      Serial.println("Unknown");
-  }
 
 
 	// SD Card Setup
@@ -148,8 +105,8 @@ void setup() {
 			Wire.beginTransmission(addr);
 			if (!Wire.endTransmission()) {
 				if (addr == ELT_ADDR) {
-					//Serial.print("\t\tonline - port ");
-					//Serial.println(t);
+					Serial.print("\t\tonline - port ");
+					Serial.println(t);
 				}
 			}
 		}
@@ -161,14 +118,6 @@ void setup() {
 	dhtB.begin();
 	//Serial.println("\t\tonline");
 
-	// Display Sampling Message
-	//lcd.setCursor(0, 0);
-	//lcd.print("    Sampling    ");
-	//lcd.setCursor(0, 1);
-	//lcd.print("      Data      ");
-	//Serial.println("\n\n================================");
-	//Serial.println("====      Sampling Data     ====");
-	//Serial.println("================================\n");
 
 	if (PUMP_TRIG) {
 	// Turn Pump On
@@ -292,20 +241,6 @@ void loop() {
 		}
 		data += delim;
 
-		// Report Sensor Values to lcd
-		lcd.clear();
-		lcd.setCursor(0, 0);
-		lcd.print(co2A);
-		lcd.setCursor(5, 0);
-		lcd.print(String(tempA));
-		lcd.setCursor(12, 0);
-		lcd.print(String(humidA));
-		lcd.setCursor(0, 1);
-		lcd.print(co2B);
-		lcd.setCursor(5, 1);
-		lcd.print(String(tempB));
-		lcd.setCursor(12, 1);
-		lcd.print(String(humidB));
 	}
 
 	// Data Sampling Indicator Off
