@@ -54,12 +54,16 @@ end
 
 %% Plot
 
-figure();
+fluxes = sortrows(fluxes);
+
+
+fig = figure();
 hold on;
-plot(fluxes(:,3), fluxes(:,1), 'go', 'DisplayName', "DAQ Fluxes");
-plot(fluxes(:,3), fluxes(:,2), 'bo','DisplayName', "LICOR Fluxes");
-plot(fluxes(:,3),fluxes(:,3), 'r-', 'DisplayName', '1:1 Fit');
-title("Lab Flux Test Results");
+plot(fluxes(:,3), fluxes(:,1), 'gd-', 'DisplayName', "Low-Cost System", 'LineWidth', 2, 'MarkerSize', 10);
+plot(fluxes(:,3), fluxes(:,2), 'bs-','DisplayName', "LI-7810", 'LineWidth', 2, 'MarkerSize', 10);
+plot(fluxes(:,3),fluxes(:,3), 'r--', 'DisplayName', '1:1 Fit', 'LineWidth', 2);
+title("Laboratory Flux Measurements");
 xlabel("Delivered CO_2 Flux [mg/m^2/s]")
 ylabel("Measured CO_2 Flux [mg/m^2/s]")
 legend()
+fontsize(fig, 60, 'points')
