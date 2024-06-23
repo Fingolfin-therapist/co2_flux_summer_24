@@ -55,7 +55,7 @@ title("Ambient Colocation Raw Data")
 grid on
 
 %% Apply Windowing Filter and Syncronize Dataset
-windowSize = 500;
+windowSize = 1000;
 num_trans = (1/windowSize)*ones(1,windowSize);
 den_trans = 1;
 picarro.CO2_sync = filter(num_trans, den_trans, picarro.CO2_sync);
@@ -97,7 +97,7 @@ test_ct = testd(:, 7);
 lin_rega = fitlm(train_ca, train_ct);
 lin_regb = fitlm(train_cb, train_ct);
 
-step = 5;
+step = 100;
 results = [];
 best_lin = {};
 best_ann = [];
@@ -117,78 +117,87 @@ for boundry = min(train_ct)+step:step:max(train_ct)
 
     disp(100*(boundry-min(train_ct))/max(train_ct) + "% Complete" )
 
-    lin_rega_low = fitlm(train_ca(train_ct < boundry), train_ct(train_ct < boundry));
-    lin_rega_high = fitlm(train_ca(train_ct >= boundry), train_ct(train_ct >= boundry));
-    lin_regb_low = fitlm(train_cb(train_ct < boundry), train_ct(train_ct < boundry));
-    lin_regb_high = fitlm(train_cb(train_ct >= boundry), train_ct(train_ct >= boundry));
 
-    lin_rega_high_pred = predict(lin_rega_high, test_ca(test_ct > boundry));
-    lin_regb_high_pred = predict(lin_rega_high, test_ca(test_ct > boundry));
-    lin_rega_low_pred = predict(lin_rega_low, test_ca(test_ct < boundry));
-    lin_regb_low_pred = predict(lin_rega_low, test_ca(test_ct < boundry));
+    if (length(train_ca(train_ct > boundry)) > 1)
     
-    %disp("A Low:  " + lin_rega_low.RMSE)
-    %disp("A High: " + lin_rega_high.RMSE)
-    %disp("B Low:  " + lin_regb_low.RMSE)
-    %disp("B High: " + lin_regb_high.RMSE)
-    %disp("-")
-
-
-    ann_rega_low = feedforwardnet([16, 16]);
-    ann_regb_low = feedforwardnet([16, 16]);
-    ann_rega_high = feedforwardnet([16, 16]);
-    ann_regb_high = feedforwardnet([16, 16]);
-    ann_rega_low = train(ann_rega_low, train_ca(train_ct < boundry)', train_ct(train_ct < boundry)');
-    ann_regb_low = train(ann_regb_low, train_cb(train_ct < boundry)', train_ct(train_ct < boundry)');
-    ann_rega_high = train(ann_rega_high, train_ca(train_ct > boundry)', train_ct(train_ct > boundry)');
-    ann_regb_high = train(ann_regb_high, train_cb(train_ct > boundry)', train_ct(train_ct > boundry)');
-
-    ann_rega_high_pred = ann_rega_high(test_ca(test_ct > boundry)')';
-    ann_regb_high_pred = ann_regb_high(test_cb(test_ct > boundry)')';
-    ann_rega_low_pred = ann_rega_low(test_ca(test_ct < boundry)')';
-    ann_regb_low_pred = ann_regb_low(test_cb(test_ct < boundry)')';
+        [lin_rega_low, lin_rega_low_gof, ~] = fit(train_ca(train_ct < boundry), train_ct(train_ct < boundry), 'poly2');
+        [lin_rega_high, lin_rega_high_gof, ~] = fit(train_ca(train_ct >= boundry), train_ct(train_ct >= boundry), 'poly2');
+        [lin_regb_low, lin_regb_low_gof, ~] = fit(train_cb(train_ct < boundry), train_ct(train_ct < boundry), 'poly2');
+        [lin_regb_high, lin_regb_high_gof, ~] = fit(train_cb(train_ct >= boundry), train_ct(train_ct >= boundry), 'poly2');
     
-    ann_rega_low_rmse = sqrt(mean((ann_rega_low_pred - test_ct(test_ct < boundry)).^2));
-    ann_regb_low_rmse = sqrt(mean((ann_regb_low_pred - test_ct(test_ct < boundry)).^2));
-    ann_rega_high_rmse = sqrt(mean((ann_rega_high_pred - test_ct(test_ct > boundry)).^2));
-    ann_regb_high_rmse = sqrt(mean((ann_regb_high_pred - test_ct(test_ct > boundry)).^2));
-
-    ann_rega_r2_low = 1 - ((sum((ann_rega_low_pred - test_ct(test_ct < boundry)).^2))/(sum(((test_ct(test_ct < boundry) - mean(test_ct(test_ct < boundry))).^2))));
-    ann_regb_r2_low = 1 - ((sum((ann_regb_low_pred - test_ct(test_ct < boundry)).^2))/(sum(((test_ct(test_ct < boundry) - mean(test_ct(test_ct < boundry))).^2))));
-    lin_rega_r2_low = 1 - ((sum((lin_rega_low_pred - test_ct(test_ct < boundry)).^2))/(sum(((test_ct(test_ct < boundry) - mean(test_ct(test_ct < boundry))).^2))));
-    lin_regb_r2_low = 1 - ((sum((lin_regb_low_pred - test_ct(test_ct < boundry)).^2))/(sum(((test_ct(test_ct < boundry) - mean(test_ct(test_ct < boundry))).^2))));
-    ann_rega_r2_high = 1 - ((sum((ann_rega_high_pred - test_ct(test_ct > boundry)).^2))/(sum(((test_ct(test_ct > boundry) - mean(test_ct(test_ct > boundry))).^2))));
-    ann_regb_r2_high = 1 - ((sum((ann_regb_high_pred - test_ct(test_ct > boundry)).^2))/(sum(((test_ct(test_ct > boundry) - mean(test_ct(test_ct > boundry))).^2))));
-    lin_rega_r2_high = 1 - ((sum((lin_rega_high_pred - test_ct(test_ct > boundry)).^2))/(sum(((test_ct(test_ct > boundry) - mean(test_ct(test_ct > boundry))).^2))));
-    lin_regb_r2_high = 1 - ((sum((lin_regb_high_pred - test_ct(test_ct > boundry)).^2))/(sum(((test_ct(test_ct > boundry) - mean(test_ct(test_ct > boundry))).^2))));
+        lin_rega_high_pred = lin_rega_high(test_ca(test_ct > boundry));
+        lin_regb_high_pred = lin_rega_high(test_ca(test_ct > boundry));
+        lin_rega_low_pred = lin_rega_low(test_ca(test_ct < boundry));
+        lin_regb_low_pred = lin_rega_low(test_ca(test_ct < boundry));
         
-    ann_r2_avg = (ann_rega_r2_low + ann_regb_r2_low + ann_rega_r2_high + ann_rega_r2_high)/4;
-    lin_r2_avg = (lin_rega_r2_low + lin_regb_r2_low + lin_rega_r2_high + lin_rega_r2_high)/4;
+        %disp("A Low:  " + lin_rega_low.RMSE)
+        %disp("A High: " + lin_rega_high.RMSE)
+        %disp("B Low:  " + lin_regb_low.RMSE)
+        %disp("B High: " + lin_regb_high.RMSE)
+        %disp("-")
+    
+    
+        ann_rega_low = feedforwardnet([16, 16]);
+        ann_regb_low = feedforwardnet([16, 16]);
+        ann_rega_high = feedforwardnet([16, 16]);
+        ann_regb_high = feedforwardnet([16, 16]);
+        ann_rega_low.trainParam.showWindow = false;
+        ann_regb_low.trainParam.showWindow = false;
+        ann_rega_high.trainParam.showWindow = false;
+        ann_regb_high.trainParam.showWindow = false;
+        ann_rega_low = train(ann_rega_low, train_ca(train_ct < boundry)', train_ct(train_ct < boundry)');
+        ann_regb_low = train(ann_regb_low, train_cb(train_ct < boundry)', train_ct(train_ct < boundry)');
+        ann_rega_high = train(ann_rega_high, train_ca(train_ct > boundry)', train_ct(train_ct > boundry)');
+        ann_regb_high = train(ann_regb_high, train_cb(train_ct > boundry)', train_ct(train_ct > boundry)');
+    
+        ann_rega_high_pred = ann_rega_high(test_ca(test_ct > boundry)')';
+        ann_regb_high_pred = ann_regb_high(test_cb(test_ct > boundry)')';
+        ann_rega_low_pred = ann_rega_low(test_ca(test_ct < boundry)')';
+        ann_regb_low_pred = ann_regb_low(test_cb(test_ct < boundry)')';
+        
+        ann_rega_low_rmse = sqrt(mean((ann_rega_low_pred - test_ct(test_ct < boundry)).^2));
+        ann_regb_low_rmse = sqrt(mean((ann_regb_low_pred - test_ct(test_ct < boundry)).^2));
+        ann_rega_high_rmse = sqrt(mean((ann_rega_high_pred - test_ct(test_ct > boundry)).^2));
+        ann_regb_high_rmse = sqrt(mean((ann_regb_high_pred - test_ct(test_ct > boundry)).^2));
+    
+        ann_rega_r2_low = 1 - ((sum((ann_rega_low_pred - test_ct(test_ct < boundry)).^2))/(sum(((test_ct(test_ct < boundry) - mean(test_ct(test_ct < boundry))).^2))));
+        ann_regb_r2_low = 1 - ((sum((ann_regb_low_pred - test_ct(test_ct < boundry)).^2))/(sum(((test_ct(test_ct < boundry) - mean(test_ct(test_ct < boundry))).^2))));
+        lin_rega_r2_low = 1 - ((sum((lin_rega_low_pred - test_ct(test_ct < boundry)).^2))/(sum(((test_ct(test_ct < boundry) - mean(test_ct(test_ct < boundry))).^2))));
+        lin_regb_r2_low = 1 - ((sum((lin_regb_low_pred - test_ct(test_ct < boundry)).^2))/(sum(((test_ct(test_ct < boundry) - mean(test_ct(test_ct < boundry))).^2))));
+        ann_rega_r2_high = 1 - ((sum((ann_rega_high_pred - test_ct(test_ct > boundry)).^2))/(sum(((test_ct(test_ct > boundry) - mean(test_ct(test_ct > boundry))).^2))));
+        ann_regb_r2_high = 1 - ((sum((ann_regb_high_pred - test_ct(test_ct > boundry)).^2))/(sum(((test_ct(test_ct > boundry) - mean(test_ct(test_ct > boundry))).^2))));
+        lin_rega_r2_high = 1 - ((sum((lin_rega_high_pred - test_ct(test_ct > boundry)).^2))/(sum(((test_ct(test_ct > boundry) - mean(test_ct(test_ct > boundry))).^2))));
+        lin_regb_r2_high = 1 - ((sum((lin_regb_high_pred - test_ct(test_ct > boundry)).^2))/(sum(((test_ct(test_ct > boundry) - mean(test_ct(test_ct > boundry))).^2))));
+            
+        ann_r2_avg = (ann_rega_r2_low + ann_regb_r2_low + ann_rega_r2_high + ann_rega_r2_high)/4;
+        lin_r2_avg = (lin_rega_r2_low + lin_regb_r2_low + lin_rega_r2_high + lin_rega_r2_high)/4;
+    
+    
+        results = [results; boundry, lin_rega_low_gof.rmse, lin_rega_high_gof.rmse, lin_regb_low_gof.rmse, lin_regb_high_gof.rmse, ann_rega_low_rmse, ann_rega_high_rmse, ann_regb_low_rmse, ann_regb_high_rmse];
+    
+        ann_rmse_sum = ann_rega_low_rmse + ann_regb_low_rmse + ann_rega_high_rmse + ann_regb_high_rmse;
+        lin_rmse_sum = lin_rega_low_gof.rmse + lin_rega_high_gof.rmse + lin_regb_low_gof.rmse + lin_regb_high_gof.rmse;
+        if ann_rmse_sum < best_ann_rmse
+            best_ann_rmse = ann_rmse_sum;
+            best_ann = [ann_rega_low, ann_regb_low, ann_rega_high, ann_regb_high];
+            best_ann_boundry = boundry;
+        end
+        if lin_rmse_sum < best_lin_rmse
+            best_lin_rmse = lin_rmse_sum;
+            best_lin = {lin_rega_low, lin_regb_low, lin_rega_high, lin_regb_high};
+            best_lin_boundry = boundry;
+        end
+        if ann_r2_avg > best_ann_r2_avg
+            best_ann_r2_avg = ann_r2_avg;
+            best_r2_ann = [ann_rega_low, ann_regb_low, ann_rega_high, ann_regb_high];
+            best_r2_ann_boundry = boundry;
+        end
+        if lin_r2_avg > best_lin_r2_avg
+            best_lin_r2_avg = lin_r2_avg;
+            best_r2_lin = {lin_rega_low, lin_regb_low, lin_rega_high, lin_regb_high};
+            best_r2_lin_boundry = boundry;
+        end
 
-
-    results = [results; boundry, lin_rega_low.RMSE, lin_rega_high.RMSE, lin_regb_low.RMSE, lin_regb_high.RMSE, ann_rega_low_rmse, ann_rega_high_rmse, ann_regb_low_rmse, ann_regb_high_rmse];
-
-    ann_rmse_sum = ann_rega_low_rmse + ann_regb_low_rmse + ann_rega_high_rmse + ann_regb_high_rmse;
-    lin_rmse_sum = lin_rega_low.RMSE + lin_rega_high.RMSE + lin_regb_low.RMSE + lin_regb_high.RMSE;
-    if ann_rmse_sum < best_ann_rmse
-        best_ann_rmse = ann_rmse_sum
-        best_ann = [ann_rega_low, ann_regb_low, ann_rega_high, ann_regb_high];
-        best_ann_boundry = boundry
-    end
-    if lin_rmse_sum < best_lin_rmse
-        best_lin_rmse = lin_rmse_sum
-        best_lin = {lin_rega_low, lin_regb_low, lin_rega_high, lin_regb_high};
-        best_lin_boundry = boundry
-    end
-    if ann_r2_avg > best_ann_r2_avg
-        best_ann_r2_avg = ann_r2_avg
-        best_r2_ann = [ann_rega_low, ann_regb_low, ann_rega_high, ann_regb_high];
-        best_r2_ann_boundry = boundry
-    end
-    if lin_r2_avg > best_lin_r2_avg
-        best_lin_r2_avg = lin_r2_avg
-        best_r2_lin = {lin_rega_low, lin_regb_low, lin_rega_high, lin_regb_high};
-        best_r2_lin_boundry = boundry
     end
 
     
@@ -317,6 +326,34 @@ xlabel("Picarro CO_2 [ppm]")
 legend(["RMSE:    "+lin_regb_rmse+"\newlineR^2:    "+lin_regb_r2,'1:1 Fit'])
 grid on
 sgtitle("Comparison of Linear and ANN Regression Performance")
+
+
+
+
+
+fontsize(fig5, 30, 'points')
+fontname(fig5, 'Times New Roman')
+
+
+
+fig = figure();
+hold on
+
+plot(test_ct, test_ct, 'r--', 'LineWidth', 2);
+plot(test_ct, ann_rega_pred, 'b.', 'MarkerSize', 20);
+
+txt = "RMSE: " + ann_rega_rmse + " ppm\newlineR^2: " + ann_rega_r2;
+
+text(min(xlim)+5, max(ylim)-35,  txt,'Interpreter','tex');
+xlabel("ELT A CO_2 [ppm]",'Interpreter','tex');
+ylabel("LICOR CO_2 [ppm]", 'Interpreter','tex');
+title('Linear Regression for Calibrating NDIR CO_2 Sensors','Interpreter','tex');
+legend(["Fitted CO_2 Dataset","1:1 Fit"], 'Interpreter', 'tex');
+fontsize(fig,50, 'points')
+fontname(fig, 'Times New Roman')
+
+
+exportgraphics(fig5, 'ambient_colocation.png', 'Resolution', 350)
 
 %%
 %save("../flux_test/calib", 'lin_rega', 'lin_regb', 'ann_rega', 'ann_regb')
