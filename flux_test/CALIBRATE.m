@@ -16,5 +16,6 @@ function [data, co2_err] = CALIBRATE(data, dataset)
     % apply ANN regressions, instead of linear
     %corr_data.CB_CALIB = ann_regb(corr_data.CB')';
     %corr_data.CA_CALIB = ann_rega(corr_data.CA')';
-    co2_err = lin_rega.RMSE;
+
+    co2_err = max(lin_rega.RMSE,lin_regb.RMSE);
 end

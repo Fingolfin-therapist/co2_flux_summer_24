@@ -7,7 +7,7 @@ function config = analysis_config()
     config.V  = 0.015220183; % [m^3]
     
     % Environment Assumptions
-    config.P = 78082.9; % [Pa]
+    config.P = 79082.866; % [Pa] 79082.866 / OG 78082.9
     config.T = 293.15; % [K]
     config.MW = 44010; % [mg/mol]
     
@@ -19,7 +19,7 @@ function config = analysis_config()
     
     % Preprocessing
     config.sample_dt = minutes(1);     % retiming applied to entire dataset
-    config.smooth_dt = minutes(10);     % retiming applied to per set-point dataset
+    config.smooth_dt = minutes(5);     % retiming applied to per set-point dataset
     
     % Choose Dataset (File Location)
     config.datasets = ["5.21","5.22", "5.29"];

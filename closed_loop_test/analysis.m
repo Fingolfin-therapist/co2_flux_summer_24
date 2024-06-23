@@ -101,22 +101,25 @@ text_size = 48;
 fig = figure();
 hold on
 
-plot(CA_Model.Variables.y, CA_Model.Variables.y, 'r--', 'LineWidth', 2);
-plot(CA_Model.Fitted, CA_Model.Variables.y, 'b.', 'MarkerSize', 20);
+plot(CA_Model.Variables.y, CA_Model.Variables.y, '--', 'LineWidth', 5, 'MarkerSize', 20);
+plot(CA_Model.Fitted, CA_Model.Variables.y, '.', 'LineWidth', 5, 'MarkerSize', 20);
 
-txt = "RMSE: " + CA_Model.RMSE + " ppm\newlineR^2: " + CA_Model.Rsquared.Ordinary + "\newline\newliney=x_1*"+round(table2array(CA_Model.Coefficients(1,2)),1)+ "+x_2*"+round(table2array(CA_Model.Coefficients(1,3)),1)+ "+x_3*"+round(table2array(CA_Model.Coefficients(1,4)),1)+ "+"+round(table2array(CA_Model.Coefficients(1,1)),1);
 
-text(min(xlim)+5, max(ylim)-25,  txt,'Interpreter','tex');
 xlabel("ELT A CO_2 [ppm]",'Interpreter','tex');
 ylabel("LICOR CO_2 [ppm]", 'Interpreter','tex');
-title('Linear Regression for Calibrating NDIR CO_2 Sensors','Interpreter','tex');
-legend(["Fitted CO_2 Dataset","1:1 Fit"], 'Interpreter', 'tex');
-fontsize(fig,50, 'points')
-fontname(fig, 'Times New Roman')
+title('Multiple Linear Regression Calibration','Interpreter','tex');
+legend(["1:1 Fit","Fitted CO_2 Dataset"], 'Interpreter', 'tex');
+fontsize(fig, 50, 'points')
+fontname('Times New Roman')
+
+txt = "RMSE: " + round(CA_Model.RMSE,3) + " ppm\newlineR^2: " + round(CA_Model.Rsquared.Ordinary,3) + "\newliney="+round(table2array(CA_Model.Coefficients(1,2)),1)+ "x_1+"+round(table2array(CA_Model.Coefficients(1,3)),1)+ "x_2+"+round(table2array(CA_Model.Coefficients(1,4)),1)+ "x_3+"+round(table2array(CA_Model.Coefficients(1,1)),1);
+
+text(min(xlim)+5, max(ylim)-30,  txt,'Interpreter','tex', 'FontSize', 40, 'FontName', 'Times New Roman');
 
 
-figure();
+fig = figure();
 plot(CB_Model);
+
 
 txt = "RMSE: " + CB_Model.RMSE + "\newlineR^2: " + CB_Model.Rsquared.Ordinary;
 

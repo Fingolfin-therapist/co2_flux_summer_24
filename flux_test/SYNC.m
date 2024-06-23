@@ -35,7 +35,7 @@ function [data] = SYNC(daq, licor, map, config, dataset)
         
         % Calculate correlation, ignoring NaNs
         valid_idx = ~isnan(data.C) & ~isnan(shifted_CB);
-        if sum(valid_idx) > 10
+        if sum(valid_idx) > 100
             current_corr = corr(data.C(valid_idx), shifted_CB(valid_idx));
             % Update best correlation and lag
             if current_corr > best_corr
