@@ -20,6 +20,11 @@ data.F = 1e6*((data.Q.*(data.CB-mean(data.CA)))./config.As);
 data.F_licor = 1e6*((data.Q.*(data.C-min(data.C)))./config.As);
 data.UF = 1e6*config.flux_uncert(data.CB-data.CA, config.As, co2_err, config.uQ, data.Q);
 
+disp("Flux(licor): " + mean(data.F_licor))
+disp("Flux(daq): " + mean(data.F) + " [" + mean(data.UF)+"]");
+disp("Flux(delivered): " + f_delivered);
+
+
 % convert to working units
 % ppm -> mg/m^3
 % lpm -> cms
@@ -43,10 +48,12 @@ Ca_daq = min(data.CB);
 Cb_daq = max(data.CB);
 f_daq = (Q*Cb_daq-(Q-sp)*Ca_daq)./config.As;
 
+f_uncert = config.flux_uncert(Cb_daq - Ca_daq, config.As, co2_err, config.uQ, data.Q);
+
 f_delivered = (config.ppm_to_mg(3003)*sp)/config.As;
 
 disp("Flux(licor): " + f_licor)
-disp("Flux(daq): " + f_daq)
+disp("Flux(daq): " + f_daq + " [" + f_uncert+"]");
 disp("Flux(delivered): " + f_delivered);
 
 results = [f_licor, f_daq, f_delivered];
