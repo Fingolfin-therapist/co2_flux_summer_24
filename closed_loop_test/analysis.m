@@ -104,14 +104,15 @@ hold on
 plot(CA_Model.Variables.y, CA_Model.Variables.y, 'r--', 'LineWidth', 2);
 plot(CA_Model.Fitted, CA_Model.Variables.y, 'b.', 'MarkerSize', 20);
 
-txt = "RMSE: " + CA_Model.RMSE + " [ppm CO_2]\newlineR^2: " + CA_Model.Rsquared.Ordinary + "\newline\newliney=[CO_2]_{Measured}*"+table2array(CA_Model.Coefficients(1,2))+ "\newline+[Temp.]_{Measured}*"+table2array(CA_Model.Coefficients(1,3))+ "\newline+[Humid.]_{Measured}*"+table2array(CA_Model.Coefficients(1,4))+ "\newline+"+table2array(CA_Model.Coefficients(1,1));
+txt = "RMSE: " + CA_Model.RMSE + " ppm\newlineR^2: " + CA_Model.Rsquared.Ordinary + "\newline\newliney=x_1*"+round(table2array(CA_Model.Coefficients(1,2)),1)+ "+x_2*"+round(table2array(CA_Model.Coefficients(1,3)),1)+ "+x_3*"+round(table2array(CA_Model.Coefficients(1,4)),1)+ "+"+round(table2array(CA_Model.Coefficients(1,1)),1);
 
-text(min(xlim)+10, max(ylim)-50,  txt,'Interpreter','tex');
-xlabel("ELT A CO_2 [ppm CO_2]",'Interpreter','tex');
-ylabel("LICOR CO_2 [ppm CO_2]", 'Interpreter','tex');
+text(min(xlim)+5, max(ylim)-25,  txt,'Interpreter','tex');
+xlabel("ELT A CO_2 [ppm]",'Interpreter','tex');
+ylabel("LICOR CO_2 [ppm]", 'Interpreter','tex');
 title('Linear Regression for Calibrating NDIR CO_2 Sensors','Interpreter','tex');
 legend(["Fitted CO_2 Dataset","1:1 Fit"], 'Interpreter', 'tex');
 fontsize(fig,50, 'points')
+fontname(fig, 'Times New Roman')
 
 
 figure();

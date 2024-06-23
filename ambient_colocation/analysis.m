@@ -55,7 +55,7 @@ title("Ambient Colocation Raw Data")
 grid on
 
 %% Apply Windowing Filter and Syncronize Dataset
-windowSize = 500;
+windowSize = 1000;
 num_trans = (1/windowSize)*ones(1,windowSize);
 den_trans = 1;
 picarro.CO2_sync = filter(num_trans, den_trans, picarro.CO2_sync);
@@ -326,6 +326,34 @@ xlabel("Picarro CO_2 [ppm]")
 legend(["RMSE:    "+lin_regb_rmse+"\newlineR^2:    "+lin_regb_r2,'1:1 Fit'])
 grid on
 sgtitle("Comparison of Linear and ANN Regression Performance")
+
+
+
+
+
+fontsize(fig5, 30, 'points')
+fontname(fig5, 'Times New Roman')
+
+
+
+fig = figure();
+hold on
+
+plot(test_ct, test_ct, 'r--', 'LineWidth', 2);
+plot(test_ct, ann_rega_pred, 'b.', 'MarkerSize', 20);
+
+txt = "RMSE: " + ann_rega_rmse + " ppm\newlineR^2: " + ann_rega_r2;
+
+text(min(xlim)+5, max(ylim)-35,  txt,'Interpreter','tex');
+xlabel("ELT A CO_2 [ppm]",'Interpreter','tex');
+ylabel("LICOR CO_2 [ppm]", 'Interpreter','tex');
+title('Linear Regression for Calibrating NDIR CO_2 Sensors','Interpreter','tex');
+legend(["Fitted CO_2 Dataset","1:1 Fit"], 'Interpreter', 'tex');
+fontsize(fig,50, 'points')
+fontname(fig, 'Times New Roman')
+
+
+exportgraphics(fig5, 'ambient_colocation.png', 'Resolution', 350)
 
 %%
 %save("../flux_test/calib", 'lin_rega', 'lin_regb', 'ann_rega', 'ann_regb')
