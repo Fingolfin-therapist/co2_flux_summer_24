@@ -107,7 +107,7 @@ plot(CA_Model.Fitted, CA_Model.Variables.y, '.', 'LineWidth', 5, 'MarkerSize', 2
 
 xlabel("ELT A CO_2 [ppm]",'Interpreter','tex');
 ylabel("LICOR CO_2 [ppm]", 'Interpreter','tex');
-title('Multiple Linear Regression Calibration','Interpreter','tex');
+title('Chamber Sensor Calibration','Interpreter','tex');
 legend(["1:1 Fit","Fitted CO_2 Dataset"], 'Interpreter', 'tex');
 fontsize(fig, 50, 'points')
 fontname('Times New Roman')

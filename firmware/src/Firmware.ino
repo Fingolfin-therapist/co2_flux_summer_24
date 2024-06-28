@@ -16,7 +16,7 @@
 
 // SETTINGS ===================================
 
-const bool DATALOG = false;
+const bool DATALOG = true;
 const char* LOGFILENAME = "data.txt";
 
 const bool SAMPLE = true;
@@ -29,18 +29,10 @@ const bool PUMP_TRIG = false;
 #include "DAQ.h"
 
 // Pin Definitions
-#define SD_CS_PIN		10
-#define LCD_RS_PIN		7
-#define LCD_EN_PIN		6
-#define LCD_D4_PIN		14
-#define LCD_D5_PIN		15
-#define LCD_D6_PIN		16
-#define LCD_D7_PIN		17
+#define SD_CS_PIN		4
 #define DHT_DATA_A_PIN	3
 #define DHT_DATA_B_PIN	2
 #define DATA_LED_PIN	8
-#define PUMP_LED_PIN	9
-#define PUMP_TRIG_PIN	5
 
 // I2C Addresses
 #define FLOW_ADDR		0x50
@@ -68,11 +60,6 @@ void setup() {
 	//Serial.println("\n\nStarting CO2 Flux DAQ...");
 	Wire.begin();
 	pinMode(DATA_LED_PIN, OUTPUT);
-	pinMode(PUMP_LED_PIN, OUTPUT);
-
-	// GPIO Output Setup
-	pinMode(PUMP_TRIG_PIN, OUTPUT);
-	pinMode(SD_CS_PIN, OUTPUT);
 	
 	// RTC Setup
 	//Serial.print("\tRTC:\t");
@@ -89,11 +76,11 @@ void setup() {
 
 
 	// SD Card Setup
-	//Serial.println("\t- Micro-SD:\t");
+	Serial.println("\t- Micro-SD:\t");
 	if (!SD.begin(SD_CS_PIN)) {
-		//Serial.println("\t\toffline");
+		Serial.println("\t\toffline");
 	} else {
-		//Serial.println("\t\tonline");
+		Serial.println("\t\tonline");
 	}
 
 	// ELT Setup
@@ -118,16 +105,6 @@ void setup() {
 	dhtB.begin();
 	//Serial.println("\t\tonline");
 
-
-	if (PUMP_TRIG) {
-	// Turn Pump On
-
-		digitalWrite(PUMP_LED_PIN, HIGH);
-		digitalWrite(PUMP_TRIG_PIN, HIGH);
-	} else {
-		digitalWrite(PUMP_LED_PIN, LOW);
-		digitalWrite(PUMP_TRIG_PIN, LOW);
-	}
 }
 
 
@@ -251,7 +228,7 @@ void loop() {
 		// Data logging
 		Serial.print("Saving Data...");
 
-		File file = SD.open(LOGFILENAME, FILE_WRITE);
+		File file = SD.open("datalog.txt", FILE_WRITE);
 		if (file) {
 			Serial.print("Writing to " + String(LOGFILENAME)  + "...");
 			file.println(data);

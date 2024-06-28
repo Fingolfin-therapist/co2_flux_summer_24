@@ -354,19 +354,19 @@ fontname(fig, 'Times New Roman')
 %%
 
 fig = figure();
-subplot(1, 1, 1)
+subplot(1, 2, 1)
 hold on
 
-% plot(test_ct, test_ct, '--', 'LineWidth', 2);
-% plot(test_ct, ann_rega_pred, '.', 'MarkerSize', 20);
-% 
-% txt = "RMSE: " + round(ann_rega_rmse,3) + " ppm\newlineR^2: " + round(ann_rega_r2,3);
-% 
-% text(min(xlim)+5, max(ylim)-40,  txt,'Interpreter','tex');
-% xlabel("ELT A CO_2 [ppm]",'Interpreter','tex');
-% ylabel("Picarro CRDS CO_2 [ppm]", 'Interpreter','tex');
-% title('Performance','Interpreter','tex');
-% legend(["1:1 Fit","Fitted CO_2 Dataset"], 'Interpreter', 'tex');
+plot(test_ct, test_ct, '--', 'LineWidth', 2);
+plot(test_ct, ann_rega_pred, '.', 'MarkerSize', 20);
+
+txt = "RMSE: " + round(ann_rega_rmse,3) + " ppm\newlineR^2: " + round(ann_rega_r2,3);
+
+text(min(xlim)+5, max(ylim)-40,  txt,'Interpreter','tex');
+ylabel("ELT A CO_2 [ppm]",'Interpreter','tex');
+xlabel("Picarro CRDS CO_2 [ppm]", 'Interpreter','tex');
+title('Performance','Interpreter','tex');
+legend(["1:1 Fit","Fitted CO_2 Dataset"], 'Interpreter', 'tex');
 
 
 
@@ -377,7 +377,7 @@ daq = daq(times, :);
 times = picarro.T < datetime(2024, 5, 4, 23,59,59,0) & picarro.T > datetime(2024, 4, 28, 23,59,59,0);
 picarro = picarro(times, :);
 
-subplot(1, 1, 1)
+subplot(1, 2, 2)
 hold on
 plot(picarro.T, picarro.CO2_sync, '.','LineWidth', 2.5, 'MarkerSize', 2)
 plot(daq.T, daq.CA,'s', 'LineWidth', 2.5, 'MarkerSize', 2)
@@ -389,7 +389,7 @@ title("Performance")
 grid on
 
 
-sgtitle("Network Calibration")
+sgtitle("Ambient Sensor Calibration")
 
 
 fontsize(fig,50, 'points')
