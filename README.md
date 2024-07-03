@@ -1,27 +1,48 @@
 # Wildfire CO<sub>2</sub> Flux Project - Summer 2024
+
 This directory includes scripts and data for the 2024 Summer Wildfire CO<sub>2</sub> Flux Project. Please see the repository structure section below.
 
-# Repository Outline
+# Repository Structure
 
-**Ambient Colocation - `/ambient_colocation`**
+|Folder|Description|
+|----|----|
+|ELT CALIBRATION|Scripts for calibrating ELT S300-3V CO<sub>2</sub> sensors. Ambient colocations are used for ambient sensors. Ambient and closed loop colocations are used for ambient sensors.|
+|FLUXES|Scripts for calculating fluxes from datasets.|
+|LICOR|Calibration files for LICOR LI-7810.|
+|MFC|Calibration and control scripts for Mass Flow Controller (MFC).|
+|MODELING|Theoretical applications of box model.|
+|DAQ|Hardware and firmware for data acquisition system (DAQ).|
 
-Contains analysis scripts and datasets for greenhouse ambient colocation between ELT CO2 sensors and the Picarro instrument.
+# Contributing
 
-**Flux Test - `/flux_test`**
+To ensure smooth collaboration and avoid unnecessary merge requests, please follow these simple steps for contribution:
 
-Contains set-point calculation scripts, analysis scripts, and datasets for the 1st lab flux test.
+1) Fork the Repository
+    - Click the Fork button at the top right of this repository page to create a copy of the repository under your GitHub account.
+2) Clone Your Fork
+    - Clone your forked repository to your local machine:
+    - `git clone https://github.com/BikeLinc/co2_flux_summer_24.git`
+    - `cd your-repo`
+3) Create a New Branch
+    - Create a new branch for your work. Name your branch based on the feature or issue you are working on:
+    - `git checkout -b feature/your-feature-name`
+4) Make Your Changes
+    - Make your changes to the code.
+5) Commit Your Changes
+    - Commit your changes with a clear and concise commit message:
+    - `git add .`
+    - `git commit -m "Add description of changes"`
+6) Push Your Branch
+    - Push your branch to your forked repository:
+    - `git push origin feature/your-feature-name`
+7) Open a Pull Request
+    - Go to the original repository on GitHub. You should see a prompt to open a pull request. Click on it and provide a clear description of your changes.
+8) Wait for Review
+    - Your pull request will be reviewed. Make any necessary changes based on feedback.
 
-**Lab Colocation - `/lab_colocation`**
+For an extensive guide to git and GitHub, see [GitHub's Git Guide](https://github.com/git-guides).
 
-Contains analysis scripts and datasets for the lab colocation (aka dilution test) between ELT CO2 sensors and the LICOR instrument.
-
-**Measurement Range - `/measurement_range`**
-
-Contains scripts that simulate the mass balance model equation for a dynamic flux chamber.
-
-**MFC 2.5 LPM Calibration w/ 400 ppm CO2 - `/mfc_calibration`**
-
-Contains datasets for calibrating the ALICAT 2.5 L/min Mass Flow Controller for gas mixture of 400 ppm CO2, 2 ppm CH4, balanced.
 
 # Questions
+
 Please email Lincoln (lascheer@fortlewis.edu) for any questions about this repository.
