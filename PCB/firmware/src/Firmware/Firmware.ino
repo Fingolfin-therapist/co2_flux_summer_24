@@ -11,7 +11,7 @@
  * 
 */
 
-#include "firmware.h"
+#include "../firmware.h"
 
 // Enable Subroutines
 const bool DATALOG = true;
@@ -266,4 +266,3 @@ void loop() {
 	delay(interval);
 
 }
-
